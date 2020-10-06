@@ -4,8 +4,8 @@ namespace SimplyLogging.Core.Interfaces
 {
     public interface ILoggingHandlerManager
     {
-        ILoggingHandlerManager AddHandler(ILoggingHandler loggingHandler);
-        ILoggingHandlerManager AddHandler(ILoggingHandler loggingHandler, Predicate<LogMessage> filter);
-        bool RemoveHandler(ILoggingHandler loggingHandler);
+        ILoggingHandlerManager AddHandler(ILoggingObject loggingHandler);
+        ILoggingHandlerManager AddHandler(ILoggingObject loggingHandler, Predicate<LogMessage> filter);
+        bool RemoveHandler(ILoggingObject loggingHandler);
     }
 }

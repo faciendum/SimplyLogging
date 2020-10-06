@@ -1,22 +1,23 @@
 ﻿using SimplyLogging.Core.Interfaces;
 using SimplyLogging.Core.Styles;
+using System;
 
 namespace SimplyLogging.Core.Handlers
 {
-   public class ConsoleLoggingHandler : ILoggingHandler
+    public class DebugLogging : ILoggingObject
     {
         private readonly ILoggingStyle _logStyle;
 
-        public ConsoleLoggingHandler() : this(new DefaultStyle()) { }
+        public DebugLogging() : this(new DefaultStyle()) { }
 
-        public ConsoleLoggingHandler(ILoggingStyle logStyle)
+        public DebugLogging(ILoggingStyle logStyle)
         {
             _logStyle = logStyle;
         }
 
         public void Write(LogMessage logMessage)
         {
-           System.Diagnostics.Debug.WriteLine(_logStyle.ApplyStyle(logMessage));
+            Console.WriteLine(_logStyle.ApplyStyle(logMessage));
         }
     }
 }

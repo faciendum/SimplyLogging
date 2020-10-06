@@ -6,7 +6,7 @@ namespace SimplyLogging.Core.Styles
     {
         public string ApplyStyle(LogMessage log)
         {
-            return $"{log.DateTime}:yyyy.MM.dd HH:mm:ss.ff| {log.LogLevel}| {log.CallingClass}\t| {log.CallingMethod}\t| {log.LineNumber}\t| {log.Text}";
+            return $"{log.DateTime:yyyy.MM.dd HH:mm:ss.ff}|{log.LogLevel}| {log.CallingClass}\t| {log.CallingMethod}\t| {log.LineNumber}\t| {log.Text}";
         }
     }
 }

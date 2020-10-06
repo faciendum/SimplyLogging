@@ -1,6 +1,6 @@
 ﻿namespace SimplyLogging.Core.Interfaces
 {
-    public interface ILoggingHandler
+    public interface ILoggingObject
     {
         void Write(LogMessage logMessage);
     }

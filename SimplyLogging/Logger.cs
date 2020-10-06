@@ -12,11 +12,12 @@ namespace SimplyLogging
 {
     public static class Logger
     {
-        private static LogPublisher LogPublisher {get;}
-        private static DebugLogger DebugLogger {get;}
-        private static bool IsDebugMode {get; set;} = true;
-        private static bool IsActive {get; set;} = true;
-        private static LogLevelKind _defaultLevel = LogLevelKind.Trace;
+        private static LogPublisher LogPublisher { get; }
+        private static DebugLogger DebugLogger { get; }
+        private static bool IsDebugMode { get; set; } = true;
+        private static bool IsActive { get; set; } = true;
+        private static LogLevelKind DefaultLogLevel { get; set; } = LogLevelKind.Trace;
+
         private static readonly object Sync = new object();
 
         static Logger()
@@ -29,15 +30,15 @@ namespace SimplyLogging
 
         public static void DefaultInitialization()
         {
-            LogPublisher.AddHandler(new ConsoleLoggingHandler()).AddHandler(new FileLoggingHandler());
+            LogPublisher.AddHandler(new ConsoleLogging()).AddHandler(new FileLogging());
             Log(LogLevelKind.Info, "Default initialization");
         }
 
         public static void Log(string message = "- no message -")
         {
-            Log(_defaultLevel, message);
+            Log(DefaultLogLevel, message);
         }
-      
+
         public static void Log(LogLevelKind level, string message)
         {
             StackFrame stackFrame = LogHelper.FindStackFrame();
@@ -62,7 +63,7 @@ namespace SimplyLogging
 
         public static void Log<TClass>(string message) where TClass : class
         {
-            Log<TClass>(_defaultLevel, message);
+            Log<TClass>(DefaultLogLevel, message);
         }
 
         public static void Log<TClass>(LogLevelKind level, string message) where TClass : class
@@ -88,6 +89,11 @@ namespace SimplyLogging
         public static IEnumerable<LogMessage> Messages
         {
             get { return LogPublisher.Messages; }
+        }
+
+        public static ILoggingHandlerManager LoggingHandlerManager
+        {
+            get { return LogPublisher; }
         }
 
         static class FilterPredicates

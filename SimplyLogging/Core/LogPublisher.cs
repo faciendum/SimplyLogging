@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SimplyLogging.Core
 {
-    internal sealed class FilteredHandler : ILoggingHandler
+    internal sealed class FilteredHandler : ILoggingObject
     {
         public Predicate<LogMessage> Filter { get; set; }
-        public ILoggingHandler Handler { get; set; }
+        public ILoggingObject Handler { get; set; }
 
         public void Write(LogMessage logMessage)
         {
@@ -19,7 +19,7 @@ namespace SimplyLogging.Core
 
     internal class LogPublisher : ILoggingHandlerManager
     {
-        private readonly IList<ILoggingHandler> _loggerHandlers;
+        private readonly IList<ILoggingObject> _loggerHandlers;
         private readonly IList<LogMessage> _messages;
 
         /// <summary>
@@ -30,14 +30,14 @@ namespace SimplyLogging.Core
 
         public LogPublisher()
         {
-            _loggerHandlers = new List<ILoggingHandler>();
+            _loggerHandlers = new List<ILoggingObject>();
             _messages = new List<LogMessage>();
             StoreLogMessages = false;
         }
 
         public LogPublisher(bool storeLogMessages)
         {
-            _loggerHandlers = new List<ILoggingHandler>();
+            _loggerHandlers = new List<ILoggingObject>();
             _messages = new List<LogMessage>();
             StoreLogMessages = storeLogMessages;
         }
@@ -50,14 +50,14 @@ namespace SimplyLogging.Core
                 loggerHandler.Write(logMessage);
         }
 
-        public ILoggingHandlerManager AddHandler(ILoggingHandler handler)
+        public ILoggingHandlerManager AddHandler(ILoggingObject handler)
         {
             if (handler != null)
                 _loggerHandlers.Add(handler);
             return this;
         }
 
-        public ILoggingHandlerManager AddHandler(ILoggingHandler handler, Predicate<LogMessage> filter)
+        public ILoggingHandlerManager AddHandler(ILoggingObject handler, Predicate<LogMessage> filter)
         {
             if ((filter == null) || handler == null)
             {
@@ -71,7 +71,7 @@ namespace SimplyLogging.Core
             });
         }
 
-        public bool RemoveHandler(ILoggingHandler handler)
+        public bool RemoveHandler(ILoggingObject handler)
         {
             return _loggerHandlers.Remove(handler);
         }
