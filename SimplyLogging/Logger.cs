@@ -1,7 +1,8 @@
 ﻿using SimplyLogging.Core;
 using SimplyLogging.Core.Enums;
-using SimplyLogging.Core.Handlers;
+using SimplyLogging.Core.Implementations;
 using SimplyLogging.Core.Interfaces;
+using SimplyLogging.Core.Models;
 using SimplyLogging.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,8 @@ namespace SimplyLogging
 {
     public static class Logger
     {
-        private static LogPublisher LogPublisher { get; }
+        #region Properties
+        private static LogManager LogManager { get; }
         private static DebugLogger DebugLogger { get; }
         private static bool IsDebugMode { get; set; } = true;
         private static bool IsActive { get; set; } = true;
@@ -20,17 +22,28 @@ namespace SimplyLogging
 
         private static readonly object Sync = new object();
 
+        public static IEnumerable<LogMessage> Messages
+        {
+            get { return LogManager.Messages; }
+        }
+
+        public static ILoggingObjectManager LoggingHandlerManager
+        {
+            get { return LogManager; }
+        }
+        #endregion
+
         static Logger()
         {
             lock (Sync)
             {
-                LogPublisher = new LogPublisher();
+                LogManager = new LogManager();
             }
         }
 
         public static void DefaultInitialization()
         {
-            LogPublisher.AddHandler(new ConsoleLogging()).AddHandler(new FileLogging());
+            LogManager.AddLoggingObject(new ConsoleLogging()).AddLoggingObject(new FileLogging());
             Log(LogLevelKind.Info, "Default initialization");
         }
 
@@ -57,7 +70,7 @@ namespace SimplyLogging
 
         public static void Log<TClass>(Exception exception) where TClass : class
         {
-            string message = $"Log exception -> Message: {exception.Message}\nStackTrace: {exception.StackTrace}";
+            string message = $"Exception -> Message: {exception.Message}\nStackTrace: {exception.StackTrace}";
             Log<TClass>(LogLevelKind.Error, message);
         }
 
@@ -83,79 +96,7 @@ namespace SimplyLogging
                 return;
 
             LogMessage logMessage = new LogMessage(level, message, DateTime.Now, callingClass, callingMethod, lineNumber);
-            LogPublisher.Write(logMessage);
-        }
-
-        public static IEnumerable<LogMessage> Messages
-        {
-            get { return LogPublisher.Messages; }
-        }
-
-        public static ILoggingHandlerManager LoggingHandlerManager
-        {
-            get { return LogPublisher; }
-        }
-
-        static class FilterPredicates
-        {
-            public static bool ByLevelHigher(LogLevelKind logMessLevel, LogLevelKind filterLevel)
-            {
-                return ((int)logMessLevel >= (int)filterLevel);
-            }
-
-            public static bool ByLevelLower(LogLevelKind logMessLevel, LogLevelKind filterLevel)
-            {
-                return ((int)logMessLevel <= (int)filterLevel);
-            }
-
-            public static bool ByLevelExactly(LogLevelKind logMessLevel, LogLevelKind filterLevel)
-            {
-                return ((int)logMessLevel == (int)filterLevel);
-            }
-
-            public static bool ByLevel(LogMessage logMessage, LogLevelKind filterLevel, Func<LogLevelKind, LogLevelKind, bool> filterPred)
-            {
-                return filterPred(logMessage.LogLevel, filterLevel);
-            }
-        }
-
-        public class FilterByLevel
-        {
-            public LogLevelKind FilteredLevel { get; set; }
-            public bool ExactlyLevel { get; set; }
-            public bool OnlyHigherLevel { get; set; }
-
-            public FilterByLevel(LogLevelKind level)
-            {
-                FilteredLevel = level;
-                ExactlyLevel = true;
-                OnlyHigherLevel = true;
-            }
-
-            public FilterByLevel()
-            {
-                ExactlyLevel = false;
-                OnlyHigherLevel = true;
-            }
-
-            public Predicate<LogMessage> Filter
-            {
-                get
-                {
-                    return delegate (LogMessage logMessage)
-                    {
-                        return FilterPredicates.ByLevel(logMessage, FilteredLevel, delegate (LogLevelKind lm, LogLevelKind fl)
-                        {
-                            return ExactlyLevel ?
-                                FilterPredicates.ByLevelExactly(lm, fl) :
-                                (OnlyHigherLevel ?
-                                    FilterPredicates.ByLevelHigher(lm, fl) :
-                                    FilterPredicates.ByLevelLower(lm, fl)
-                                );
-                        });
-                    };
-                }
-            }
+            LogManager.Write(logMessage);
         }
     }
 }

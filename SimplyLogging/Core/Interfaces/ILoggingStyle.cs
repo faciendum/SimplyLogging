@@ -1,4 +1,6 @@
-﻿namespace SimplyLogging.Core.Interfaces
+﻿using SimplyLogging.Core.Models;
+
+namespace SimplyLogging.Core.Interfaces
 {
     public interface ILoggingStyle
     {

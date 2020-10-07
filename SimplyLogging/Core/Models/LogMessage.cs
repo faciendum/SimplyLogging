@@ -2,7 +2,7 @@
 using SimplyLogging.Core.Styles;
 using System;
 
-namespace SimplyLogging.Core
+namespace SimplyLogging.Core.Models
 {
     public sealed class LogMessage
     {

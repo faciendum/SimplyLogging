@@ -1,25 +1,15 @@
-﻿using SimplyLogging.Core.Interfaces;
+﻿using SimplyLogging.Core.Implementations;
+using SimplyLogging.Core.Interfaces;
+using SimplyLogging.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SimplyLogging.Core
 {
-    internal sealed class FilteredHandler : ILoggingObject
+    internal class LogManager : ILoggingObjectManager
     {
-        public Predicate<LogMessage> Filter { get; set; }
-        public ILoggingObject Handler { get; set; }
-
-        public void Write(LogMessage logMessage)
-        {
-            if (Filter(logMessage))
-                Handler.Write(logMessage);
-        }
-    }
-
-    internal class LogPublisher : ILoggingHandlerManager
-    {
-        private readonly IList<ILoggingObject> _loggerHandlers;
+        private readonly IList<ILoggingObject> _loggingObjects;
         private readonly IList<LogMessage> _messages;
 
         /// <summary>
@@ -28,16 +18,16 @@ namespace SimplyLogging.Core
         /// <value><c>true</c> if store log messages; otherwise, <c>false</c>. By default is <c>false</c></value>
         public bool StoreLogMessages { get; set; }
 
-        public LogPublisher()
+        public LogManager()
         {
-            _loggerHandlers = new List<ILoggingObject>();
+            _loggingObjects = new List<ILoggingObject>();
             _messages = new List<LogMessage>();
             StoreLogMessages = false;
         }
 
-        public LogPublisher(bool storeLogMessages)
+        public LogManager(bool storeLogMessages)
         {
-            _loggerHandlers = new List<ILoggingObject>();
+            _loggingObjects = new List<ILoggingObject>();
             _messages = new List<LogMessage>();
             StoreLogMessages = storeLogMessages;
         }
@@ -46,34 +36,34 @@ namespace SimplyLogging.Core
         {
             if (StoreLogMessages)
                 _messages.Add(logMessage);
-            foreach (var loggerHandler in _loggerHandlers)
+            foreach (var loggerHandler in _loggingObjects)
                 loggerHandler.Write(logMessage);
         }
 
-        public ILoggingHandlerManager AddHandler(ILoggingObject handler)
+        public ILoggingObjectManager AddLoggingObject(ILoggingObject handler)
         {
             if (handler != null)
-                _loggerHandlers.Add(handler);
+                _loggingObjects.Add(handler);
             return this;
         }
 
-        public ILoggingHandlerManager AddHandler(ILoggingObject handler, Predicate<LogMessage> filter)
+        public ILoggingObjectManager AddLoggingObject(ILoggingObject loggingObject, Predicate<LogMessage> filter)
         {
-            if ((filter == null) || handler == null)
+            if ((filter == null) || loggingObject == null)
             {
                 return this;
             }
-              
-            return AddHandler(new FilteredHandler()
+
+            return AddLoggingObject(new FilteredLogging()
             {
                 Filter = filter,
-                Handler = handler
+                LoggingObject = loggingObject
             });
         }
 
-        public bool RemoveHandler(ILoggingObject handler)
+        public bool Remove(ILoggingObject loggingObject)
         {
-            return _loggerHandlers.Remove(handler);
+            return _loggingObjects.Remove(loggingObject);
         }
 
         public IEnumerable<LogMessage> Messages

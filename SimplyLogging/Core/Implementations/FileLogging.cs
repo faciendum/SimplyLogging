@@ -1,11 +1,11 @@
 ﻿using SimplyLogging.Core.Interfaces;
 using SimplyLogging.Core.Styles;
 using System;
-using System.Collections.Generic;
+using SimplyLogging.Core.Models;
 using System.IO;
 using System.Text;
 
-namespace SimplyLogging.Core.Handlers
+namespace SimplyLogging.Core.Implementations
 {
     public class FileLogging : ILoggingObject
     {
@@ -50,7 +50,7 @@ namespace SimplyLogging.Core.Handlers
         private static string CreateFileName()
         {
             DateTime now = DateTime.Now;
-            return $"Log_{now.Year:0000}_{now.Month:00}_{now.Day}-{now.Hour:00}-{now.Minute}_{Guid.NewGuid()}.log";
+            return $"Log_{now.Year:0000}_{now.Month:00}_{now.Day}-{now.Hour:00}-{now.Minute}.log";
         }
     }
 }

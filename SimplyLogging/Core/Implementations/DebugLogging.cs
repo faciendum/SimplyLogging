@@ -1,8 +1,9 @@
 ﻿using SimplyLogging.Core.Interfaces;
+using SimplyLogging.Core.Models;
 using SimplyLogging.Core.Styles;
 using System;
 
-namespace SimplyLogging.Core.Handlers
+namespace SimplyLogging.Core.Implementations
 {
     public class DebugLogging : ILoggingObject
     {
@@ -17,7 +18,7 @@ namespace SimplyLogging.Core.Handlers
 
         public void Write(LogMessage logMessage)
         {
-            Console.WriteLine(_logStyle.ApplyStyle(logMessage));
+            System.Diagnostics.Debug.WriteLine(_logStyle.ApplyStyle(logMessage));
         }
     }
 }
